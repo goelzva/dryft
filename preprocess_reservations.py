@@ -2,11 +2,10 @@ import pandas as pd
 
 
 def preprocess_reservations(df: pd.DataFrame) -> pd.DataFrame:
-
     # drop duplicate column 'BME.1'
     df = df.drop(columns=['BME.1'])
 
-    # Rename columns
+    # Rename columns to useful english names
     df = df.rename(columns={
         'Pos': 'pos',
         'ReservNr': 'reservation_number',
@@ -26,15 +25,13 @@ def preprocess_reservations(df: pd.DataFrame) -> pd.DataFrame:
     df['registration_date'] = df['registration_date'].apply(convert_date_to_datetime)
     df['_time'] = pd.to_datetime(df['_time'], format='%H:%M:%S')
 
-    # format required_quantity
+    # format required_quantity (different separators)
     df['required_quantity'] = df['required_quantity'].apply(convert_required_quantity_to_float)
 
-    # format deleted
+    # format deleted (X -> True, '' -> False)
     df['is_deleted'] = df['is_deleted'].apply(convert_deleted_string_to_boolean)
-
     # drop duplicates
     df = df.drop_duplicates()
-
     return df
 
 
@@ -44,7 +41,6 @@ def convert_required_quantity_to_float(value: str) -> float:
     elif ',' in value:
         value = value.replace(',', '.')
 
-    # strip any whitespace
     value = value.strip()
     return float(value)
 
